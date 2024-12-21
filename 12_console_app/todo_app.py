@@ -51,14 +51,17 @@ def validate(user_input, ids: list) -> bool:
     return is_valid
     
 
-def get_user_choice(ids: list, is_option_selection: bool = True) -> int:
+def get_user_choice(ids: list, selection_type: str = 'option') -> int:
 
-    if is_option_selection:
+    if selection_type == 'option':
         info_txt = "Выберите нужную команду введя её номер: "
         warning_txt = "Вы ввели неверную команду. Попробуйте ещё раз."
-    else:
+    elif selection_type == 'task_id':
         info_txt = "\nВведите ID задачи: "
         warning_txt = "Вы ввели неверный ID. Попробуйте ещё раз."
+    else:
+        info_txt = "\nВведите идентификатор поля для редактирования: "
+        warning_txt = "Вы ввели неверный идентификатор поля. Попробуйте ещё раз."
 
     valid_choice = False
     while not valid_choice:
@@ -93,7 +96,7 @@ def add_task():
     new_task['is_done'] = False
 
     task_details_count = len(task_details) 
-    for ix in range(3, task_details_count):
+    for ix in range(3, task_details_count+1):
         detail = task_details[ix]['detail']
         caption = task_details[ix]['caption']
 
@@ -130,28 +133,49 @@ def show_tasks(is_done: bool = False):
     input("\nНажмите любую клавишу чтобы продолжить...")
 
 
-def show_task_details(target_task: dict):
+def show_task_details(target_task: dict, show_status: bool = True):
     title = f' ЗАДАЧА С ID = {target_task['task_id']} '
     print(f"\n{title.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
     task_details_count = len(task_details) 
-    for ix in range(3, task_details_count):
+    for ix in range(3, task_details_count+1):
         caption = task_details[ix]['caption']
         detail = task_details[ix]['detail']
-        print(f"{caption}: {target_task[detail]}")
+        print(f"{caption} ({ix}): {target_task[detail]}")
 
-    is_done = target_task['is_done']
-    status_color = f"{'\033[92m' if is_done else '\033[91m'}"
-    status_txt = f"{status_color}{'выполнено' if target_task['is_done'] else 'не выполнено'}\033[00m"
-    print(f"{task_details[2]['caption']}: {status_txt}")
+    if show_status:
+        is_done = target_task['is_done']
+        status_color = f"{'\033[92m' if is_done else '\033[91m'}"
+        status_txt = f"{status_color}{'выполнено' if target_task['is_done'] else 'не выполнено'}\033[00m"
+        print(f"{task_details[2]['caption']} (2): {status_txt}")
 
 
 def show_task_by_id():
-    target_id = get_user_choice(tasks.keys(), is_option_selection=False)
+    target_id = get_user_choice(tasks.keys(), selection_type='task_id')
 
     target_task = tasks[target_id]
     show_task_details(target_task)
 
+    input("\nНажмите любую клавишу чтобы продолжить...")
+
+
+def edit_task():
+    target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+
+    target_task = tasks[target_id]
+    show_task_details(target_task, show_status=False)
+
+    task_details_count = len(task_details)
+    task_ixs = list(range(3, task_details_count+1))
+    user_choice = get_user_choice(task_ixs, selection_type='detail_id')
+    
+    target_detail = task_details[user_choice]['detail']
+    target_caption = task_details[user_choice]['caption']
+
+    updated_value = input(f"Введите новое значение для {target_caption.lower()}: ")
+    target_task[target_detail] = updated_value
+
+    print(f"\nЗАДАЧА {target_id} УСПЕШНО ОБНОВЛЕНА!")
     input("\nНажмите любую клавишу чтобы продолжить...")
 
 
@@ -175,7 +199,7 @@ def main():
             case 3:
                 show_tasks(True)
             case 4:
-                print(f" {'some text'}\033[00m")
+                edit_task()
             case 5:
                 show_task_by_id()
             case _:
