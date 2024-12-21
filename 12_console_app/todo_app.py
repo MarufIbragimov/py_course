@@ -2,7 +2,7 @@
 
 TXT_MAX_LENGTH: int = 50
 FILLER_SYMBOL: str = '*'
-tasks: dict[int, str] = {}
+tasks: dict[int, dict] = {}
 info_txt = "Выберите нужную команду введя её номер: "
 
 main_menu: dict[int, str] = {
@@ -110,6 +110,18 @@ def add_task():
         add_task()
 
 
+def print_tasks():
+    print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
+    
+    if len(tasks) == 0:
+        print("Ваш список задач пуст")
+    else:
+        for key, value in tasks.items():
+            print(f"{key}. {value['title']}")    
+
+    input("\nНажмите любую клавишу чтобы продолжить...")
+
+
 def main():
 
     print("\nДобро пожаловать в Todo-List-App!", end='\n\n')
@@ -122,6 +134,8 @@ def main():
                 break
             case 1:
                 add_task()
+            case 2:
+                print_tasks()
             case _:
                 print("Отлично", end='\n\n')
 
