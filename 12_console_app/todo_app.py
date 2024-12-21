@@ -3,7 +3,7 @@
 TXT_MAX_LENGTH: int = 50
 FILLER_SYMBOL: str = '*'
 tasks: dict[int, dict] = {}
-info_txt = "Выберите нужную команду введя её номер: "
+
 
 main_menu: dict[int, str] = {
     1: 'Добавить новую задачу',
@@ -15,12 +15,12 @@ main_menu: dict[int, str] = {
 }
 
 task_details: dict[int, dict[str, str]] = {
-    1: {'option': 'task_id', 'caption': 'id задачи'},
-    2: {'option': 'is_done', 'caption': 'статус задачи'},
-    3: {'option': 'title', 'caption': 'название задачи'},
-    4: {'option': 'description', 'caption': 'описание задачи'},
-    5: {'option': 'deadline', 'caption': 'дедлайн задачи'},
-    6: {'option': 'priority', 'caption': 'приоритет задачи'},
+    1: {'detail': 'task_id', 'caption': 'ID задачи'},
+    2: {'detail': 'is_done', 'caption': 'Статус задачи'},
+    3: {'detail': 'title', 'caption': 'Название задачи'},
+    4: {'detail': 'description', 'caption': 'Описание задачи'},
+    5: {'detail': 'deadline', 'caption': 'Дедлайн задачи'},
+    6: {'detail': 'priority', 'caption': 'Приоритет задачи'},
 }
 
 task_addition_submenu: dict[int, str] = {
@@ -51,7 +51,14 @@ def validate(user_input, ids: list) -> bool:
     return is_valid
     
 
-def get_user_choice(ids: list) -> int:
+def get_user_choice(ids: list, is_option_selection: bool = True) -> int:
+
+    if is_option_selection:
+        info_txt = "Выберите нужную команду введя её номер: "
+        warning_txt = "Вы ввели неверную команду. Попробуйте ещё раз."
+    else:
+        info_txt = "\nВведите ID задачи: "
+        warning_txt = "Вы ввели неверный ID. Попробуйте ещё раз."
 
     valid_choice = False
     while not valid_choice:
@@ -59,7 +66,6 @@ def get_user_choice(ids: list) -> int:
         valid_choice = validate(user_input, ids)
     
         if not valid_choice:
-            warning_txt = "Вы ввели неверную команду. Попробуйте ещё раз."
             print(warning_txt, end='\n\n')
     
     return int(user_input)
@@ -88,16 +94,15 @@ def add_task():
 
     task_details_count = len(task_details) 
     for ix in range(3, task_details_count):
-        detail = task_details[ix]
-        option = detail['option']
-        caption = detail['caption']
+        detail = task_details[ix]['detail']
+        caption = task_details[ix]['caption']
 
-        value = input(f"Введите {caption}: ")
+        value = input(f"Введите {caption.lower()}: ")
         if value.strip() == '0':
             print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
             return
         
-        new_task[option] = value
+        new_task[detail] = value
 
     tasks[task_id] = new_task
 
@@ -125,8 +130,29 @@ def show_tasks(is_done: bool = False):
     input("\nНажмите любую клавишу чтобы продолжить...")
 
 
+def show_task_details(target_task: dict):
+    title = f' ЗАДАЧА С ID = {target_task['task_id']} '
+    print(f"\n{title.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
+    
+    task_details_count = len(task_details) 
+    for ix in range(3, task_details_count):
+        caption = task_details[ix]['caption']
+        detail = task_details[ix]['detail']
+        print(f"{caption}: {target_task[detail]}")
+
+    is_done = target_task['is_done']
+    status_color = f"{'\033[92m' if is_done else '\033[91m'}"
+    status_txt = f"{status_color}{'выполнено' if target_task['is_done'] else 'не выполнено'}\033[00m"
+    print(f"{task_details[2]['caption']}: {status_txt}")
+
+
 def show_task_by_id():
-    pass
+    target_id = get_user_choice(tasks.keys(), is_option_selection=False)
+
+    target_task = tasks[target_id]
+    show_task_details(target_task)
+
+    input("\nНажмите любую клавишу чтобы продолжить...")
 
 
 def main():
@@ -148,6 +174,10 @@ def main():
                 show_tasks()
             case 3:
                 show_tasks(True)
+            case 4:
+                print(f" {'some text'}\033[00m")
+            case 5:
+                show_task_by_id()
             case _:
                 print("Отлично", end='\n\n')
 
