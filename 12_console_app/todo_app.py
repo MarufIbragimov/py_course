@@ -119,10 +119,8 @@ def show_tasks(is_done: bool = False):
     if len(tasks_to_print) == 0:
         print(f"У вас нету {'выполненных' if is_done else 'активных'} задач")
     else:
-        for key in tasks:
-            if tasks[key]['is_done'] == is_done:
-                for key, value in tasks.items():
-                    print(f"{key}. {value['title']}")    
+        for key, value in tasks_to_print.items():
+            print(f"{key}. {value['title']}")    
 
     input("\nНажмите любую клавишу чтобы продолжить...")
 
