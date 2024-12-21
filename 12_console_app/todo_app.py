@@ -34,38 +34,35 @@ menus: dict[int, dict] = {
 }
 
 
-def show_menu(menu_id: int):
-    menu_caption = menus[menu_id]['caption']
-    menu_caption = f"  {menu_caption}  "
-    menu = menus[menu_id]['menu']
-
+def show_menu(menu_caption: str, menu: dict[int, str]):
+    
+    menu_caption = f"  {menu_caption}  "  
+        
     print(f"\n{menu_caption.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     for key, value in menu.items():
         print(f"{key}. {value}")
     print('\n')
     
 
-def validate(user_input, menu_id: int) -> bool:
+def validate(user_input, ids: list) -> bool:
     user_input = user_input.strip()
-    menu = menus[menu_id]['menu']
-
-    is_valid = user_input.isnumeric() and int(user_input) in menu.keys()
+    
+    is_valid = user_input.isnumeric() and int(user_input) in ids
     return is_valid
     
 
-def select_action(menu_id: int) -> int:
-    show_menu(menu_id)
+def get_user_choice(ids: list) -> int:
 
     valid_choice = False
     while not valid_choice:
-        selected_option = input(info_txt)
-        valid_choice = validate(selected_option, menu_id)
+        user_input = input(info_txt)
+        valid_choice = validate(user_input, ids)
     
         if not valid_choice:
             warning_txt = "Вы ввели неверную команду. Попробуйте ещё раз."
             print(warning_txt, end='\n\n')
     
-    return int(selected_option)
+    return int(user_input)
 
 
 def assign_id() -> int:
@@ -106,12 +103,16 @@ def add_task():
 
     print(f"\nЗАДАЧА {task_id} УСПЕШНО ДОБАВЛЕНА!", end='\n\n')
 
-    user_choice = select_action(2)
+    menu_caption = menus[2]['caption']
+    menu = menus[2]['menu']
+    show_menu(menu_caption, menu)
+    
+    user_choice = get_user_choice(menu.keys())
     if user_choice == 1:
         add_task()
 
 
-def print_tasks(is_done: bool = False):
+def show_tasks(is_done: bool = False):
     print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
     tasks_to_print = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
@@ -126,12 +127,19 @@ def print_tasks(is_done: bool = False):
     input("\nНажмите любую клавишу чтобы продолжить...")
 
 
+def show_task_by_id():
+    pass
+
+
 def main():
 
     print("\nДобро пожаловать в Todo-List-App!", end='\n\n')
 
     while True:
-        user_choice = select_action(1)
+        menu_caption = menus[1]['caption']
+        menu = menus[1]['menu']
+        show_menu(menu_caption, menu)
+        user_choice = get_user_choice(menu.keys())
         
         match user_choice:
             case 0:
@@ -139,9 +147,9 @@ def main():
             case 1:
                 add_task()
             case 2:
-                print_tasks()
+                show_tasks()
             case 3:
-                print_tasks(True)
+                show_tasks(True)
             case _:
                 print("Отлично", end='\n\n')
 
