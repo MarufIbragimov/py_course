@@ -7,9 +7,10 @@ info_txt = "Выберите нужную команду введя её ном�
 
 main_menu: dict[int, str] = {
     1: 'Добавить новую задачу',
-    2: 'Вывести список задач',
-    3: 'Редактировать задачу',
-    4: 'Вывести задачу по ID',
+    2: 'Вывести список активных задач',
+    3: 'Вывести список выполненных задач',
+    4: 'Редактировать задачу',
+    5: 'Вывести задачу по ID',
     0: 'Выход'
 }
 
@@ -27,7 +28,7 @@ task_addition_submenu: dict[int, str] = {
     2: 'Вернуться в главное меню'
 }
 
-menus: dict[int, dict[str, dict[int, str]]] = {
+menus: dict[int, dict] = {
     1: {'caption': 'ГЛАВНОЕ МЕНЮ', 'menu': main_menu},
     2: {'caption': 'МЕНЮ', 'menu': task_addition_submenu}
 }
@@ -110,14 +111,17 @@ def add_task():
         add_task()
 
 
-def print_tasks():
+def print_tasks(is_done: bool = False):
     print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
-    if len(tasks) == 0:
-        print("Ваш список задач пуст")
+    tasks_to_print = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
+    if len(tasks_to_print) == 0:
+        print(f"У вас нету {'выполненных' if is_done else 'активных'} задач")
     else:
-        for key, value in tasks.items():
-            print(f"{key}. {value['title']}")    
+        for key in tasks:
+            if tasks[key]['is_done'] == is_done:
+                for key, value in tasks.items():
+                    print(f"{key}. {value['title']}")    
 
     input("\nНажмите любую клавишу чтобы продолжить...")
 
@@ -136,6 +140,8 @@ def main():
                 add_task()
             case 2:
                 print_tasks()
+            case 3:
+                print_tasks(True)
             case _:
                 print("Отлично", end='\n\n')
 
