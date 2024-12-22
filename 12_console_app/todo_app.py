@@ -12,6 +12,7 @@ main_menu: dict[int, str] = {
     4: 'Вывести задачу по ID',
     5: 'Редактировать задачу',
     6: 'Удалить задачу',
+    7: 'Пометить задачу как выполненную',
     0: 'Выход'
 }
 
@@ -129,20 +130,34 @@ def add_task():
         add_task()
 
 
+def check_tasks_existence(tasks_dict: dict = tasks, tasks_type: str = 'список задач') -> bool:
+    tasks_count = len(tasks_dict)
+    tasks_exist = bool(tasks_count)
+    
+    if not tasks_exist:
+        print("\nВыбранное действие не может быть выполнено")
+        print(f"так как ваш {tasks_type} пуст")
+        input("\nНажмите любую клавишу чтобы продолжить...")
+    
+    return tasks_exist
+
+
 def show_tasks(is_done: bool = False):
-    print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
     tasks_to_print = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
-    if len(tasks_to_print) == 0:
-        print(f"У вас нету {'выполненных' if is_done else 'активных'} задач")
-    else:
+    tasks_exist = check_tasks_existence(tasks_to_print, f"список {'выполненных' if is_done else 'активных'} задач")
+
+    if tasks_exist:
+        print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
+        
         for key, value in tasks_to_print.items():
             print(f"{key}. {value['title']}")    
 
-    input("\nНажмите любую клавишу чтобы продолжить...")
+        input("\nНажмите любую клавишу чтобы продолжить...")
 
 
 def show_task_details(target_task: dict, show_status: bool = True):
+    
     title = f' ЗАДАЧА С ID = {target_task['task_id']} '
     print(f"\n{title.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
@@ -160,32 +175,41 @@ def show_task_details(target_task: dict, show_status: bool = True):
 
 
 def show_task_by_id():
-    target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+    
+    tasks_exist = check_tasks_existence()
+    if tasks_exist:
+        target_id = get_user_choice(tasks.keys(), selection_type='task_id')
 
-    target_task = tasks[target_id]
-    show_task_details(target_task)
+        target_task = tasks[target_id]
+        show_task_details(target_task)
 
-    input("\nНажмите любую клавишу чтобы продолжить...")
+        input("\nНажмите любую клавишу чтобы продолжить...")
+
+
 
 
 def edit_task():
-    target_id = get_user_choice(tasks.keys(), selection_type='task_id')
-
-    target_task = tasks[target_id]
-    show_task_details(target_task, show_status=False)
-
-    task_details_count = len(task_details)
-    task_ixs = list(range(3, task_details_count+1))
-    user_choice = get_user_choice(task_ixs, selection_type='detail_id')
     
-    target_detail = task_details[user_choice]['detail']
-    target_caption = task_details[user_choice]['caption']
+    tasks_exist = check_tasks_existence()
+    if tasks_exist:
+        target_id = get_user_choice(tasks.keys(), selection_type='task_id')
 
-    updated_value = input(f"Введите новое значение для {target_caption.lower()}: ")
-    target_task[target_detail] = updated_value
+        target_task = tasks[target_id]
+        show_task_details(target_task, show_status=False)
 
-    print(f"\nЗАДАЧА {target_id} УСПЕШНО ОБНОВЛЕНА!")
-    input("\nНажмите любую клавишу чтобы продолжить...")
+        task_details_count = len(task_details)
+        task_ixs = list(range(3, task_details_count+1))
+        user_choice = get_user_choice(task_ixs, selection_type='detail_id')
+        
+        target_detail = task_details[user_choice]['detail']
+        target_caption = task_details[user_choice]['caption']
+
+        updated_value = input(f"Введите новое значение для {target_caption.lower()}: ")
+        target_task[target_detail] = updated_value
+
+        print(f"\nЗАДАЧА {target_id} УСПЕШНО ОБНОВЛЕНА!")
+        input("\nНажмите любую клавишу чтобы продолжить...")
+
 
 def ask_confirmation():
 
@@ -198,37 +222,34 @@ def ask_confirmation():
 
 def remove_task():
     
-    tasks_count = len(tasks)
-    if tasks_count == 0:
-        print("\nУ вас нету задач для удаления")
+    tasks_exist = check_tasks_existence()
+    if tasks_exist:
+
+        menu_caption = menus[3]['caption']
+        menu = menus[3]['menu']
+        show_menu(menu_caption, menu)
+        user_choice = get_user_choice(menu.keys())
+        
+
+        if user_choice == 1:
+            print(f"\n{' УДАЛЕНИЕ ЗАДАЧИ ПО ID '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
+            target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+            is_confirmed = ask_confirmation()
+            if is_confirmed:
+                del tasks[target_id]
+                print(f"\nЗАДАЧА {target_id} УСПЕШНО УДАЛЕНА!")
+            
+        elif user_choice == 2:
+            
+            is_confirmed = ask_confirmation()
+            if is_confirmed:
+                tasks.clear()
+                print("\nВСЕ ЗАДАЧИ УСПЕШНО УДАЛЕНЫ!")
+        
+        else:
+            return 
+
         input("\nНажмите любую клавишу чтобы продолжить...")
-        return
-    
-    menu_caption = menus[3]['caption']
-    menu = menus[3]['menu']
-    show_menu(menu_caption, menu)
-    user_choice = get_user_choice(menu.keys())
-    
-
-    if user_choice == 1:
-        print(f"\n{' УДАЛЕНИЕ ЗАДАЧИ ПО ID '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
-        target_id = get_user_choice(tasks.keys(), selection_type='task_id')
-        is_confirmed = ask_confirmation()
-        if is_confirmed:
-            del tasks[target_id]
-            print(f"\nЗАДАЧА {target_id} УСПЕШНО УДАЛЕНА!")
-        
-    elif user_choice == 2:
-        
-        is_confirmed = ask_confirmation()
-        if is_confirmed:
-            tasks.clear()
-            print("\nВСЕ ЗАДАЧИ УСПЕШНО УДАЛЕНЫ!")
-    
-    else:
-        return 
-
-    input("\nНажмите любую клавишу чтобы продолжить...")
 
 
 def main():
