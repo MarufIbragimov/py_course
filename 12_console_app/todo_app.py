@@ -75,6 +75,9 @@ def validate(user_input, ids: list) -> bool:
     Returns:
         bool: Результат валидации.
     """
+    ids = list(ids)
+    if 0 not in ids:
+        ids.append(0)  # чтобы можно было из любого состояния вернуться в главное меню
     user_input = user_input.strip()
     
     is_valid = user_input.isnumeric() and int(user_input) in ids
@@ -255,6 +258,11 @@ def show_task_by_id():
     if tasks_exist:
         target_id = get_user_choice(tasks.keys(), selection_type='task_id')
 
+        if target_id == 0:
+            print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
+            return
+
         target_task = tasks[target_id]
         show_task_details(target_task)
 
@@ -273,6 +281,10 @@ def edit_task():
     tasks_exist = check_tasks_existence()
     if tasks_exist:
         target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+        if target_id == 0:
+            print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
+            return
 
         target_task = tasks[target_id]
         show_task_details(target_task, show_status=False)
@@ -280,11 +292,20 @@ def edit_task():
         task_details_count = len(task_details)
         task_ixs = list(range(3, task_details_count+1))
         user_choice = get_user_choice(task_ixs, selection_type='detail_id')
-        
+        if user_choice == 0:
+            print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
+            return
+
         target_detail = task_details[user_choice]['detail']
         target_caption = task_details[user_choice]['caption']
 
         updated_value = input(f"Введите новое значение для {target_caption.lower()}: ")
+        if updated_value.strip() == '0':
+            print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
+            return
+
         target_task[target_detail] = updated_value
 
         print(f"\nЗАДАЧА {target_id} УСПЕШНО ОБНОВЛЕНА!")
@@ -329,6 +350,11 @@ def remove_task():
         if user_choice == 1:
             print(f"\n{' УДАЛЕНИЕ ЗАДАЧИ ПО ID '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
             target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+            if target_id == 0:
+                print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+                input("\nНажмите любую клавишу чтобы продолжить...")
+                return
+            
             is_confirmed = ask_confirmation()
             if is_confirmed:
                 del tasks[target_id]
@@ -362,6 +388,11 @@ def change_task_status(is_done: bool = False):
     if tasks_exist:
         task_ids = list(tasks_filtered.keys())
         target_id = get_user_choice(task_ids, selection_type='task_id')
+        if target_id == 0:
+            print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
+            return
+
         target_task = tasks_filtered[target_id]
         target_task['is_done'] = not is_done
 
