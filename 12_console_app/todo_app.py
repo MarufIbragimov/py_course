@@ -6,6 +6,7 @@ TXT_MAX_LENGTH: int = 50
 FILLER_SYMBOL: str = '*'
 tasks: dict[int, dict] = {}
 
+ids_roster = []
 
 main_menu: dict[int, str] = {
     1: 'Добавить новую задачу',
@@ -122,10 +123,10 @@ def assign_id() -> int:
     """
     new_id = 0
 
-    if len(tasks) == 0:    
+    if len(ids_roster) == 0:    
         new_id = 1
     else:
-        new_id = max(tasks.keys()) + 1
+        new_id = max(ids_roster) + 1
 
     return new_id
 
@@ -160,6 +161,7 @@ def add_task():
         new_task[detail] = value
 
     tasks[task_id] = new_task
+    ids_roster.append(task_id)
 
     print(f"\nЗАДАЧА {task_id} УСПЕШНО ДОБАВЛЕНА!", end='\n\n')
 
