@@ -6,7 +6,7 @@ TXT_MAX_LENGTH: int = 50
 FILLER_SYMBOL: str = '*'
 tasks: dict[int, dict] = {}
 
-ids_roster = []
+ids_roster: list = []
 
 main_menu: dict[int, str] = {
     1: 'Добавить новую задачу',
@@ -322,7 +322,7 @@ def ask_confirmation():
         bool: Результат подтверждения.
     """
     show_menu('ВЫ УВЕРЕНЫ?', {0: 'Нет', 1: 'Да'})
-    user_choise = get_user_choice([0,1])
+    user_choise = get_user_choice([0, 1])
     is_confirmed = False if user_choise == 0 else True 
     if not is_confirmed:
         print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО")
@@ -440,7 +440,6 @@ def main():
                 change_task_status()
             case 8:
                 change_task_status(is_done=True)
-
 
 
 if __name__ == '__main__':
