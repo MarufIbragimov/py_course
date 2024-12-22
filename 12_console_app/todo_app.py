@@ -101,7 +101,7 @@ def get_user_choice(ids: list, selection_type: str = 'option') -> int:
         warning_txt = "Вы ввели неверный идентификатор поля. Попробуйте ещё раз."
 
     valid_choice = False
-    while not valid_choice:
+    while not valid_choice:  # будет выполняться до тех пор, пока пользователь не введёт корректное значение
         user_input = input(info_txt)
         valid_choice = validate(user_input, ids)
     
@@ -299,10 +299,12 @@ def ask_confirmation():
         bool: Результат подтверждения.
     """
     show_menu('ВЫ УВЕРЕНЫ?', {0: 'Нет', 1: 'Да'})
-    is_confirmed = bool(get_user_choice([0,1]))
+    user_choise = get_user_choice([0,1])
+    is_confirmed = False if user_choise == 0 else True 
     if not is_confirmed:
         print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО")
-        return is_confirmed
+    
+    return is_confirmed
 
 
 def remove_task():
