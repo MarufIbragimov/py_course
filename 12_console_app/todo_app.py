@@ -9,8 +9,9 @@ main_menu: dict[int, str] = {
     1: 'Добавить новую задачу',
     2: 'Вывести список активных задач',
     3: 'Вывести список выполненных задач',
-    4: 'Редактировать задачу',
-    5: 'Вывести задачу по ID',
+    4: 'Вывести задачу по ID',
+    5: 'Редактировать задачу',
+    6: 'Удалить задачу',
     0: 'Выход'
 }
 
@@ -28,9 +29,16 @@ task_addition_submenu: dict[int, str] = {
     2: 'Вернуться в главное меню'
 }
 
+task_removal_menu: dict[int, str] = {
+    1: 'Удалить задачу по ID',
+    2: 'Удалить все задачи',
+    3: 'Вернуться в главное меню'
+}
+
 menus: dict[int, dict] = {
     1: {'caption': 'ГЛАВНОЕ МЕНЮ', 'menu': main_menu},
-    2: {'caption': 'МЕНЮ', 'menu': task_addition_submenu}
+    2: {'caption': 'МЕНЮ', 'menu': task_addition_submenu},
+    3: {'caption': 'УДАЛЕНИЕ', 'menu': task_removal_menu}
 }
 
 
@@ -103,6 +111,7 @@ def add_task():
         value = input(f"Введите {caption.lower()}: ")
         if value.strip() == '0':
             print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО", end='\n\n')
+            input("\nНажмите любую клавишу чтобы продолжить...")
             return
         
         new_task[detail] = value
@@ -178,6 +187,49 @@ def edit_task():
     print(f"\nЗАДАЧА {target_id} УСПЕШНО ОБНОВЛЕНА!")
     input("\nНажмите любую клавишу чтобы продолжить...")
 
+def ask_confirmation():
+
+    show_menu('ВЫ УВЕРЕНЫ?', {0: 'Нет', 1: 'Да'})
+    is_confirmed = bool(get_user_choice([0,1]))
+    if not is_confirmed:
+        print("\nДЕЙСТВИЕ БЫЛО ОТМЕНЕНО")
+        return is_confirmed
+
+
+def remove_task():
+    
+    tasks_count = len(tasks)
+    if tasks_count == 0:
+        print("\nУ вас нету задач для удаления")
+        input("\nНажмите любую клавишу чтобы продолжить...")
+        return
+    
+    menu_caption = menus[3]['caption']
+    menu = menus[3]['menu']
+    show_menu(menu_caption, menu)
+    user_choice = get_user_choice(menu.keys())
+    
+
+    if user_choice == 1:
+        print(f"\n{' УДАЛЕНИЕ ЗАДАЧИ ПО ID '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
+        target_id = get_user_choice(tasks.keys(), selection_type='task_id')
+        is_confirmed = ask_confirmation()
+        if is_confirmed:
+            del tasks[target_id]
+            print(f"\nЗАДАЧА {target_id} УСПЕШНО УДАЛЕНА!")
+        
+    elif user_choice == 2:
+        
+        is_confirmed = ask_confirmation()
+        if is_confirmed:
+            tasks.clear()
+            print("\nВСЕ ЗАДАЧИ УСПЕШНО УДАЛЕНЫ!")
+    
+    else:
+        return 
+
+    input("\nНажмите любую клавишу чтобы продолжить...")
+
 
 def main():
 
@@ -199,12 +251,11 @@ def main():
             case 3:
                 show_tasks(True)
             case 4:
-                edit_task()
-            case 5:
                 show_task_by_id()
-            case _:
-                print("Отлично", end='\n\n')
-
+            case 5:
+                edit_task()
+            case 6:
+                remove_task()
         
         # options[user_choice]
 
