@@ -13,6 +13,7 @@ main_menu: dict[int, str] = {
     5: 'Редактировать задачу',
     6: 'Удалить задачу',
     7: 'Пометить задачу как выполненную',
+    8: 'Снять пометку о выполнении задачи',
     0: 'Выход'
 }
 
@@ -144,13 +145,13 @@ def check_tasks_existence(tasks_dict: dict = tasks, tasks_type: str = 'спис�
 
 def show_tasks(is_done: bool = False):
     
-    tasks_to_print = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
-    tasks_exist = check_tasks_existence(tasks_to_print, f"список {'выполненных' if is_done else 'активных'} задач")
+    tasks_filtered = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
+    tasks_exist = check_tasks_existence(tasks_filtered, f"список {'выполненных' if is_done else 'активных'} задач")
 
     if tasks_exist:
         print(f"\n{' СПИСОК ВАШИХ ЗАДАЧ '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
         
-        for key, value in tasks_to_print.items():
+        for key, value in tasks_filtered.items():
             print(f"{key}. {value['title']}")    
 
         input("\nНажмите любую клавишу чтобы продолжить...")
@@ -229,7 +230,6 @@ def remove_task():
         menu = menus[3]['menu']
         show_menu(menu_caption, menu)
         user_choice = get_user_choice(menu.keys())
-        
 
         if user_choice == 1:
             print(f"\n{' УДАЛЕНИЕ ЗАДАЧИ ПО ID '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
@@ -250,6 +250,26 @@ def remove_task():
             return 
 
         input("\nНажмите любую клавишу чтобы продолжить...")
+
+
+def change_task_status(is_done: bool = False):
+
+    tasks_filtered = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
+    tasks_exist = check_tasks_existence(tasks_filtered, f"список {'выполненных' if is_done else 'активных'} задач")
+
+    if tasks_exist:
+        task_ids = list(tasks_filtered.keys())
+        target_id = get_user_choice(task_ids, selection_type='task_id')
+        target_task = tasks_filtered[target_id]
+        target_task['is_done'] = not is_done
+
+        if is_done:
+            print(f"\nЗАДАЧА {target_id} ПЕРЕМЕЩЕНА В СПИСОК ВЫПОЛНЕННЫХ!")
+        else:
+            print(f"\nЗАДАЧА {target_id} ПЕРЕМЕЩЕНА В СПИСОК АКТИВНЫХ!")
+
+        input("\nНажмите любую клавишу чтобы продолжить...")
+
 
 
 def main():
@@ -277,9 +297,10 @@ def main():
                 edit_task()
             case 6:
                 remove_task()
-        
-        # options[user_choice]
-
+            case 7:
+                change_task_status()
+            case 8:
+                change_task_status(is_done=True)
 
 
 
