@@ -1,4 +1,6 @@
-# import sys
+"""
+Практическая работа по созданию менеджера задач
+"""
 
 TXT_MAX_LENGTH: int = 50
 FILLER_SYMBOL: str = '*'
@@ -45,7 +47,15 @@ menus: dict[int, dict] = {
 
 
 def show_menu(menu_caption: str, menu: dict[int, str]):
-    
+    """
+    Выводит меню на консоль.
+
+    Args:
+        menu_caption (str): Заголовок меню.
+        menu (dict[int, str]): Словарь с пунктами меню.
+    Returns:
+        None
+    """
     menu_caption = f"  {menu_caption}  "  
         
     print(f"\n{menu_caption.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
@@ -55,6 +65,15 @@ def show_menu(menu_caption: str, menu: dict[int, str]):
     
 
 def validate(user_input, ids: list) -> bool:
+    """
+    Валидирует введённое пользователем значение.
+
+    Args:
+        user_input (str): Введённое пользователем значение.
+        ids (list): Список идентификаторов для валидации.
+    Returns:
+        bool: Результат валидации.
+    """
     user_input = user_input.strip()
     
     is_valid = user_input.isnumeric() and int(user_input) in ids
@@ -62,7 +81,15 @@ def validate(user_input, ids: list) -> bool:
     
 
 def get_user_choice(ids: list, selection_type: str = 'option') -> int:
+    """
+    Получает команду от пользователя и проверяет её на валидность.
 
+    Args:
+        ids (list): Список идентификаторов для валидации.
+        selection_type (str, optional): Тип выбора. Дефолтное значение 'option'.   
+    Returns:
+        int: Команду пользователя.
+    """
     if selection_type == 'option':
         info_txt = "Выберите нужную команду введя её номер: "
         warning_txt = "Вы ввели неверную команду. Попробуйте ещё раз."
@@ -85,7 +112,14 @@ def get_user_choice(ids: list, selection_type: str = 'option') -> int:
 
 
 def assign_id() -> int:
-    
+    """
+    Присваивает уникальный идентификатор задаче.
+
+    Args:
+        None
+    Returns:
+        int: Уникальный идентификатор задачи.
+    """
     new_id = 0
 
     if len(tasks) == 0:    
@@ -97,7 +131,14 @@ def assign_id() -> int:
 
 
 def add_task():
-    
+    """
+    Добавляет новую задачу в список задач.
+
+    Args:
+        None
+    Returns:
+        None
+    """
     print(f"\n{' ДОБАВЛЕНИЕ ЗАДАЧИ (для отмены введите 0) '.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
 
     new_task = dict()
@@ -132,6 +173,15 @@ def add_task():
 
 
 def check_tasks_existence(tasks_dict: dict = tasks, tasks_type: str = 'список задач') -> bool:
+    """
+    Проверяет существуют ли задачи в списке задач.
+
+    Args:
+        tasks_dict (dict, optional): Словарь задач. Дефолтное значение tasks.
+        tasks_type (str, optional): Тип задач. Дефолтное значение 'список задач'.
+    Returns:
+        bool: Результат проверки.
+    """
     tasks_count = len(tasks_dict)
     tasks_exist = bool(tasks_count)
     
@@ -144,7 +194,14 @@ def check_tasks_existence(tasks_dict: dict = tasks, tasks_type: str = 'спис�
 
 
 def show_tasks(is_done: bool = False):
-    
+    """
+    Выводит список задач на консоль.
+
+    Args:
+        is_done (bool, optional): Флаг выполненности задачи. Дефолтное значение False.
+    Returns:
+        None
+    """
     tasks_filtered = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
     tasks_exist = check_tasks_existence(tasks_filtered, f"список {'выполненных' if is_done else 'активных'} задач")
 
@@ -158,7 +215,15 @@ def show_tasks(is_done: bool = False):
 
 
 def show_task_details(target_task: dict, show_status: bool = True):
-    
+    """
+    Выводит детали задачи на консоль.
+
+    Args:
+        target_task (dict): Выбранная пользователем задача.
+        show_status (bool, optional): Флаг вывода статуса задачи. Дефолтное значение True.    
+    Returns:
+        None
+    """
     title = f' ЗАДАЧА С ID = {target_task['task_id']} '
     print(f"\n{title.center(TXT_MAX_LENGTH, FILLER_SYMBOL)}")
     
@@ -176,7 +241,14 @@ def show_task_details(target_task: dict, show_status: bool = True):
 
 
 def show_task_by_id():
-    
+    """
+    Отображает выбранную пользователем задачу.
+
+    Args:
+        None
+    Returns:
+        None
+    """
     tasks_exist = check_tasks_existence()
     if tasks_exist:
         target_id = get_user_choice(tasks.keys(), selection_type='task_id')
@@ -187,10 +259,15 @@ def show_task_by_id():
         input("\nНажмите любую клавишу чтобы продолжить...")
 
 
-
-
 def edit_task():
-    
+    """
+    Редактирует выбранную пользователем задачу.
+
+    Args:
+        None
+    Returns:
+        None
+    """
     tasks_exist = check_tasks_existence()
     if tasks_exist:
         target_id = get_user_choice(tasks.keys(), selection_type='task_id')
@@ -213,7 +290,14 @@ def edit_task():
 
 
 def ask_confirmation():
+    """
+    Запрашивает подтверждение действия у пользователя.
 
+    Args:
+        None
+    Returns:
+        bool: Результат подтверждения.
+    """
     show_menu('ВЫ УВЕРЕНЫ?', {0: 'Нет', 1: 'Да'})
     is_confirmed = bool(get_user_choice([0,1]))
     if not is_confirmed:
@@ -222,7 +306,14 @@ def ask_confirmation():
 
 
 def remove_task():
-    
+    """
+    Удаляет задачи из списка по выбору пользователя.
+
+    Args:
+        None
+    Returns:
+        None
+    """
     tasks_exist = check_tasks_existence()
     if tasks_exist:
 
@@ -253,7 +344,14 @@ def remove_task():
 
 
 def change_task_status(is_done: bool = False):
+    """
+    Изменяет статус выбранной пользователем задачи.
 
+    Args:
+        is_done (bool, optional): Флаг выполненности задачи. Дефолтное значение False.
+    Returns:
+        None
+    """
     tasks_filtered = {key: value for key, value in tasks.items() if value['is_done'] == is_done}
     tasks_exist = check_tasks_existence(tasks_filtered, f"список {'выполненных' if is_done else 'активных'} задач")
 
@@ -271,9 +369,15 @@ def change_task_status(is_done: bool = False):
         input("\nНажмите любую клавишу чтобы продолжить...")
 
 
-
 def main():
+    """
+    Мастер-функция для работы с приложением.
 
+    Args:
+        None
+    Returns:
+        None
+    """
     print("\nДобро пожаловать в Todo-List-App!", end='\n\n')
 
     while True:
